@@ -12,7 +12,7 @@ with open('q-vercel-python.json', 'r') as f:
 def get_marks():
     names = request.args.getlist('name')
 
-    if not names:  # No names provided, return all data (if needed)
+    if not names:  # No names provided, return all data
         return jsonify({"marks": student_data})
 
     else:  # Names provided, return marks for those names
@@ -25,8 +25,7 @@ def get_marks():
                     found = True
                     break
             if not found:
-                marks[name] = "Mark for " + name + " not found"
+                marks[name] = 0  # Or None, or a default value you prefer
 
-        # Extract only the values (marks) and return them as a list
-        marks_list = list(marks.values())  # Convert the dictionary values to a list
-        return jsonify(marks_list)  # Return the list of marks
+        marks_list = list(marks.values())
+        return jsonify(marks_list)
