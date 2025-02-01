@@ -16,16 +16,15 @@ def get_marks():
         return jsonify({"marks": student_data})
 
     else:  # Names provided, return marks for those names
-        marks = {}
+        marks = []  # Initialize marks as a list
         for name in names:
-            found = False
+            mark_found = False
             for student in student_data:
-                if student['name'] == name:
-                    marks[name] = student['marks']
-                    found = True
-                    break
-            if not found:
-                marks[name] = 0  # Or None, or a default value you prefer
+                if student.get('name') == name:  # Use .get() to handle missing names
+                    marks.append(student.get('marks'))  # Add the mark to the list
+                    mark_found = True
+                    break  # Exit inner loop once name is found
+            if not mark_found:
+                marks.append(0)  # Add 0 if the name is not found
 
-        marks_list = list(marks.values())
-        return jsonify(marks_list)
+        return jsonify(marks)  # Return the list of marks
