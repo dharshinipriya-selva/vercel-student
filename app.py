@@ -11,23 +11,19 @@ with open('q-vercel-python.json', 'r') as f:
 @app.route('/api')
 def get_marks():
     names = request.args.getlist('name')
+    marks = []
 
-    if not names:  # No names provided, return all data
-        return jsonify({"marks": student_data})  # Returns the list of dictionaries
+    def find_mark(name):
+        for student in student_data:
+            if student.get('name').strip() == name.strip():
+                return student.get('marks')
+        return 0  # Return 0 if name is not found
 
-    else:  # Names provided, return marks for those names
-        marks = {}
+    if names:
         for name in names:
-            found = False  # Flag to check if name was found
-            for student in student_data:  # Iterate through the list of students
-                if student['name'] == name:  # Check if the name matches
-                    marks[name] = student['marks']  # Add marks to the dictionary
-                    found = True
-                    break  # Exit inner loop once name is found
-            if not found:
-                marks[name] = "Mark for " + name + " not found"  # Name not found
+            mark = find_mark(name)
+            marks.append(mark)
 
-        return jsonify({"marks": marks})
-
+    return jsonify({"marks": marks})
 if __name__ == '__main__':
     app.run(debug=True)
