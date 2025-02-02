@@ -16,24 +16,27 @@ for student in student_data:
         unique_student_data.append(student)
         seen_names.add(student['name'])
 
-# Now use unique_student_data in your API route
 @app.route('/api')
 def get_marks():
-    names = request.args.getlist('name')
+    name1 = request.args.get('name1')  # Get the value of name1 from url.
+    name2 = request.args.get('name2')  # Get the value of name2 from url.
+
     marks = []
 
-    if not names:  # No names provided, return all data as a list of marks
-        all_marks = [student['marks'] for student in unique_student_data]
-        return jsonify(all_marks)
-    else:
-        for name in names:
-            mark_found = False
-            for student in unique_student_data:  # Use unique_student_data here
-                if student.get('name') == name:
-                    marks.append(student.get('marks'))
-                    mark_found = True
-                    break  # Exit inner loop once name is found
-            if not mark_found:
-                marks.append(0)  # Add 0 if the name is not found
+    if name1:
+        mark1 = 0  # Default mark if not found
+        for student in unique_student_data:
+            if student.get('name') == name1:
+                mark1 = student.get('marks')
+                break
+        marks.append(mark1)
 
-        return jsonify(marks)
+    if name2:
+        mark2 = 0  # Default mark if not found
+        for student in unique_student_data:
+            if student.get('name') == name2:
+                mark2 = student.get('marks')
+                break
+        marks.append(mark2)
+
+    return jsonify(marks)  # Return marks as a list
