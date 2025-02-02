@@ -8,35 +8,26 @@ CORS(app)
 with open('q-vercel-python.json', 'r') as f:
     student_data = json.load(f)
 
-# Deduplicate the student_data (keep only the first occurrence of each name)
-unique_student_data = []
-seen_names = set()
-for student in student_data:
-    if student['name'] not in seen_names:
-        unique_student_data.append(student)
-        seen_names.add(student['name'])
-
 @app.route('/api')
 def get_marks():
-    name1 = request.args.get('name1')  # Get the value of name1 from url.
-    name2 = request.args.get('name2')  # Get the value of name2 from url.
+    names = request.args.getlist('name')
 
-    marks = []
+    if not names:  # No names provided, return all data
+        return jsonify({"marks": student_data})  # Returns the list of dictionaries
 
-    if name1:
-        mark1 = 0  # Default mark if not found
-        for student in unique_student_data:
-            if student.get('name') == name1:
-                mark1 = student.get('marks')
-                break
-        marks.append(mark1)
+    else:  # Names provided, return marks for those names
+        marks = {}
+        for name in names:
+            found = False  # Flag to check if name was found
+            for student in student_data:  # Iterate through the list of students
+                if student['name'] == name:  # Check if the name matches
+                    marks[name] = student['marks']  # Add marks to the dictionary
+                    found = True
+                    break  # Exit inner loop once name is found
+            if not found:
+                marks[name] = "Mark for " + name + " not found"  # Name not found
 
-    if name2:
-        mark2 = 0  # Default mark if not found
-        for student in unique_student_data:
-            if student.get('name') == name2:
-                mark2 = student.get('marks')
-                break
-        marks.append(mark2)
+        return jsonify({"marks": marks})
 
-    return jsonify(marks)  # Return marks as a list
+if __name__ == '__main__':
+    app.run(debug=True)
